@@ -141,8 +141,8 @@
                 <div class="input-group">
                     <label>Transaction Type</label>
                     <select id="type">
-                        <option value="Loan">Loan</option>
-                        <option value="Payment">Payment</option>
+                        <option class="option" value="Loan">Loan</option>
+                        <option class="option" value="Payment">Payment</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -181,9 +181,9 @@
             <div class="search-filter">
                 <input type="text" id="searchInput" placeholder="Search by customer name or item..." onkeyup="filterTable()">
                 <select id="typeFilter" onchange="filterTable()">
-                    <option value="">All Types</option>
-                    <option value="Loan">Loans Only</option>
-                    <option value="Payment">Payments Only</option>
+                    <option class="option" value="">All Types</option>
+                    <option class="option" value="Loan">Loans Only</option>
+                    <option class="option" value="Payment">Payments Only</option>
                 </select>
             </div>
             <div class="table-container">
