@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Loan Tracker</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="loan_tracker_styles.css">
+</head>
+
+<body>
+    <div class="bg-animation">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Professional Loan Tracker</h1>
+            <p>Enterprise-grade financial management solution with persistent local storage</p>
+        </div>
+
+        <!-- Statistics Dashboard -->
+        <div class="glass-card">
+            <div class="stats-card">
+                <div class="stat-item">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value" id="totalEntries">0</div>
+                    <div class="stat-label">Total Entries</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">💼</div>
+                    <div class="stat-value" id="totalLoans">0</div>
+                    <div class="stat-label">Active Loans</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">💳</div>
+                    <div class="stat-value" id="totalPayments">0</div>
+                    <div class="stat-label">Payments Made</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value" id="totalBalance">$0</div>
+                    <div class="stat-label">Outstanding Balance</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Management Section -->
+        <div class="glass-card">
+            <div class="form-header">
+                <h2>Data Management</h2>
+                <p>Backup and restore your loan tracker database</p>
+            </div>
+            <div class="data-management">
+                <button class="btn btn-success" onclick="exportDatabase()">
+                    <span class="btn-icon">💾</span>
+                    Backup Database
+                </button>
+                <div class="file-input-wrapper">
+                    <input type="file" id="loadDatabaseFile" accept=".json" onchange="importDatabase(event)">
+                    <label for="loadDatabaseFile" class="btn btn-info file-input-label">
+                        <span class="btn-icon">📂</span>
+                        Restore Database
+                    </label>
+                </div>
+                <button class="btn btn-warning" onclick="clearAllData()">
+                    <span class="btn-icon">🗑️</span>
+                    Clear All Data
+                </button>
+            </div>
+        </div>
+
+        <!-- Customer Balance Calculator -->
+        <div class="glass-card customer-balance-section">
+            <div class="form-header">
+                <h2>Customer Balance Calculator</h2>
+                <p>Calculate individual customer loan balances and payment history</p>
+            </div>
+            <div class="customer-search">
+                <input type="text" id="customerSearchInput" placeholder="Enter customer name to calculate balance" list="customerSuggestions">
+                <datalist id="customerSuggestions"></datalist>
+                <button class="btn btn-info" onclick="calculateCustomerBalance()">
+                    <span class="btn-icon">🧮</span>
+                    Calculate Balance
+                </button>
+            </div>
+            <div id="balanceResults" class="balance-results">
+                <h3 id="customerBalanceName"></h3>
+                <div class="balance-summary">
+                    <div class="balance-item">
+                        <div class="balance-value loans-positive" id="customerTotalLoans">$0</div>
+                        <div class="balance-label">Total Loans</div>
+                    </div>
+                    <div class="balance-item">
+                        <div class="balance-value payments-positive" id="customerTotalPayments">$0</div>
+                        <div class="balance-label">Total Payments</div>
+                    </div>
+                    <div class="balance-item">
+                        <div class="balance-value remaining-positive" id="customerRemainingBalance">$0</div>
+                        <div class="balance-label">Remaining Balance</div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="customerTransactionsTable">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Item Name</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Running Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entry Form -->
+        <div class="glass-card">
+            <div class="form-header">
+                <h2>Transaction Entry</h2>
+                <p>Add new loan or payment records</p>
+            </div>
+            <div class="form-container">
+                <div class="input-group">
+                    <label>Customer Name</label>
+                    <input type="text" id="customer" placeholder="Enter customer name" list="existingCustomers">
+                    <datalist id="existingCustomers"></datalist>
+                </div>
+                <div class="input-group">
+                    <label>Transaction Type</label>
+                    <select id="type">
+                        <option value="Loan">Loan</option>
+                        <option value="Payment">Payment</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Item Name</label>
+                    <input type="text" id="item" placeholder="Enter item name or description">
+                </div>
+                <div class="input-group">
+                    <label>Date</label>
+                    <input type="date" id="date">
+                </div>
+                <div class="input-group">
+                    <label>Amount</label>
+                    <input type="number" id="amount" placeholder="0.00" step="0.01" min="0">
+                </div>
+                <div class="input-group">
+                    <label>Notes (Optional)</label>
+                    <input type="text" id="notes" placeholder="Additional notes">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="addEntry()">
+                    <span id="addButtonText">Add Entry</span>
+                </button>
+                <button class="btn btn-secondary" id="cancelEditBtn" onclick="cancelEdit()" style="display: none;">
+                    Cancel Edit
+                </button>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="glass-card">
+            <div class="table-header">
+                <h2>Transaction Records</h2>
+                <p>Complete history of all loan and payment activities</p>
+            </div>
+            <div class="search-filter">
+                <input type="text" id="searchInput" placeholder="Search by customer name or item..." onkeyup="filterTable()">
+                <select id="typeFilter" onchange="filterTable()">
+                    <option value="">All Types</option>
+                    <option value="Loan">Loans Only</option>
+                    <option value="Payment">Payments Only</option>
+                </select>
+            </div>
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('customer')">Customer <span class="sort-arrow">↕</span></th>
+                            <th onclick="sortTable('type')">Type <span class="sort-arrow">↕</span></th>
+                            <th onclick="sortTable('item')">Item Name <span class="sort-arrow">↕</span></th>
+                            <th onclick="sortTable('date')">Date <span class="sort-arrow">↕</span></th>
+                            <th onclick="sortTable('amount')">Amount <span class="sort-arrow">↕</span></th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <div class="empty-icon">📋</div>
+                    <h3>No transactions recorded</h3>
+                    <p>Begin by adding your first loan or payment entry above</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Buttons -->
+        <div class="export-section">
+            <div class="export-header">
+                <h2>Export Options</h2>
+                <p>Generate comprehensive reports in multiple formats</p>
+            </div>
+            <div class="export-buttons">
+                <button class="btn btn-success" onclick="exportToPDF()">
+                    <span class="btn-icon">📄</span>
+                    Export to PDF
+                </button>
+                <button class="btn btn-success" onclick="exportToExcel()">
+                    <span class="btn-icon">📊</span>
+                    Export to Excel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification System -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Custom JavaScript -->
+    <script src="loan_tracker_script.js"></script>
+</body>
+
+</html>
